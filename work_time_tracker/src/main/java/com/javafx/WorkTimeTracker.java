@@ -12,22 +12,26 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 public class WorkTimeTracker extends Application {
+
+    // Timer variables
+    // Start times
+    private long workingStartTime;
+
+    // Actual time
+    private long workingTime = 0;
     
     // Status flags
     private boolean isWorking = false;
     private boolean isOnBreak = false;
-
-    private void update() {
-        System.out.println("isWorking: " + isWorking + " | isOnBreak: " + isOnBreak);
-    }
-
+    
+    // Create labels for display
+    private Label workingTimeLabel = new Label("Total Working Time: 00:00:00,00");
+    private Label breakTimeLabel = new Label("Break Time: 00:00:00,00");
+    
     @Override
     public void start(Stage stage) {
 
         // Interface elements
-        // Create labels for display
-        Label workingTimeLabel = new Label("Total Working Time: 00:00:00");
-        Label breakTimeLabel = new Label("Break Time: 00:00:00");
         VBox labelsVBox = new VBox(15, workingTimeLabel, breakTimeLabel);
 
         // Buttons to control the application
@@ -50,6 +54,7 @@ public class WorkTimeTracker extends Application {
         // Button actions
         // Start button action
         startWorkButton.setOnAction(event -> {
+            workingStartTime = System.currentTimeMillis();
             isWorking = true;
         });
 
@@ -77,6 +82,25 @@ public class WorkTimeTracker extends Application {
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
 
+    }
+
+    // Update function, which executes 100 times per second
+    private void update() {
+        if (isWorking) {
+            workingTime = System.currentTimeMillis() - workingStartTime;
+            workingTimeLabel.setText("Total Working Time: " + formatTime(workingTime));
+        }
+    }
+
+    // Function that format milliseconds to h:m:s:m format
+    private String formatTime(long time) {
+        // Separated values for timer
+        int milliseconds = (int) time % 1000;
+        int seconds = (int) (time / 1000) % 60;
+        int minutes = (int) (time / 60000) % 60;
+        int hours = (int) time / 360000;
+
+        return String.format("%02d:%02d:%02d,%02d", hours, minutes, seconds, milliseconds);
     }
 
     public static void main(String[] args) {
