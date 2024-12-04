@@ -19,21 +19,28 @@ public class WorkTimeTracker extends Application {
     private long breakStartTime;
 
     // Actual time
-    private long workingTime = 0;
+    private long totalWorkingTime;
+    private long workingTime;
+    private long totalBreakTime;
+    private long breakTime;
     
     // Status flags
     private boolean isWorking = false;
     private boolean isOnBreak = false;
     
-    // Create labels for display
-    private Label workingTimeLabel = new Label("Total Working Time: 00:00:00,00");
+    // Labels for display
+    private Label totalWorkingTimeLabel = new Label("Total Working Time: 00:00:00,00");
+    private Label workingTimeLabel = new Label("Working Time: 00:00:00,00");
+    private Label totalBreakTimeLabel = new Label("Total Break Time: 00:00:00,00");
     private Label breakTimeLabel = new Label("Break Time: 00:00:00,00");
     
     @Override
     public void start(Stage stage) {
 
         // Interface elements
-        VBox labelsVBox = new VBox(15, workingTimeLabel, breakTimeLabel);
+        VBox workingLabelsVBox = new VBox(5, totalWorkingTimeLabel, workingTimeLabel);
+        VBox breakLabelsVBox = new VBox(5, totalBreakTimeLabel, breakTimeLabel);
+        VBox labelsVBox = new VBox(15, workingLabelsVBox, breakLabelsVBox);
 
         // Buttons to control the application
         Button startWorkButton = new Button("Start Work");
@@ -47,7 +54,7 @@ public class WorkTimeTracker extends Application {
         root.setPadding(new Insets(20));
 
         // Scene and stage setup
-        Scene scene = new Scene(root, 210, 270);
+        Scene scene = new Scene(root, 225, 300);
         stage.setTitle("Work Time Tracker");
         stage.setScene(scene);
         stage.show();
@@ -55,14 +62,24 @@ public class WorkTimeTracker extends Application {
         // Button actions
         // Start button action
         startWorkButton.setOnAction(event -> {
-            workingStartTime = System.currentTimeMillis();
-            isWorking = true;
-            isOnBreak = false;
+            // Can be pressed only if not started or ended
+            if (!isWorking && !isOnBreak) {
+                // Set all timers to zero
+                totalWorkingTime = 0;
+                totalBreakTime = 0;
+
+                workingStartTime = System.currentTimeMillis();
+                isWorking = true;
+                isOnBreak = false;
+            }
         });
 
         // Take break button action
         takeBreakButton.setOnAction(event -> {
+            // Break if working and not on break
             if (isWorking && !isOnBreak) {
+                totalWorkingTime += workingTime;
+
                 breakStartTime = System.currentTimeMillis();
                 isWorking = false;
                 isOnBreak = true;
@@ -71,8 +88,11 @@ public class WorkTimeTracker extends Application {
 
         // Continue working button action
         continueWorkingButton.setOnAction(event -> {
+            // Continue if on break and not working
             if (isOnBreak && !isWorking) {
-                workingStartTime += System.currentTimeMillis() - breakStartTime;
+                totalBreakTime += breakTime;
+
+                workingStartTime = System.currentTimeMillis();
                 isOnBreak = false;
                 isWorking = true;
             }
@@ -96,7 +116,16 @@ public class WorkTimeTracker extends Application {
     private void update() {
         if (isWorking) {
             workingTime = System.currentTimeMillis() - workingStartTime;
-            workingTimeLabel.setText("Total Working Time: " + formatTime(workingTime));
+            workingTimeLabel.setText("Working Time: " + formatTime(workingTime));
+
+            totalWorkingTimeLabel.setText("Total Working Time: " + formatTime(totalWorkingTime + workingTime));
+
+        }
+        else if (isOnBreak) {
+            breakTime = System.currentTimeMillis() - breakStartTime;
+            breakTimeLabel.setText("Break Time: " + formatTime(breakTime));
+
+            totalBreakTimeLabel.setText("Total Break Time: " + formatTime(totalBreakTime + breakTime));
         }
     }
 
