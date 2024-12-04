@@ -16,6 +16,7 @@ public class WorkTimeTracker extends Application {
     // Timer variables
     // Start times
     private long workingStartTime;
+    private long breakStartTime;
 
     // Actual time
     private long workingTime = 0;
@@ -46,7 +47,7 @@ public class WorkTimeTracker extends Application {
         root.setPadding(new Insets(20));
 
         // Scene and stage setup
-        Scene scene = new Scene(root, 200, 270);
+        Scene scene = new Scene(root, 210, 270);
         stage.setTitle("Work Time Tracker");
         stage.setScene(scene);
         stage.show();
@@ -56,18 +57,25 @@ public class WorkTimeTracker extends Application {
         startWorkButton.setOnAction(event -> {
             workingStartTime = System.currentTimeMillis();
             isWorking = true;
+            isOnBreak = false;
         });
 
         // Take break button action
         takeBreakButton.setOnAction(event -> {
-            isWorking = false;
-            isOnBreak = true;
+            if (isWorking && !isOnBreak) {
+                breakStartTime = System.currentTimeMillis();
+                isWorking = false;
+                isOnBreak = true;
+            }
         });
 
         // Continue working button action
         continueWorkingButton.setOnAction(event -> {
-            isOnBreak = false;
-            isWorking = true;
+            if (isOnBreak && !isWorking) {
+                workingStartTime += System.currentTimeMillis() - breakStartTime;
+                isOnBreak = false;
+                isWorking = true;
+            }
         });
 
         // End work button action
@@ -95,7 +103,7 @@ public class WorkTimeTracker extends Application {
     // Function that format milliseconds to h:m:s:m format
     private String formatTime(long time) {
         // Separated values for timer
-        int milliseconds = (int) time % 1000;
+        int milliseconds = (int) (time % 1000) / 10;
         int seconds = (int) (time / 1000) % 60;
         int minutes = (int) (time / 60000) % 60;
         int hours = (int) time / 360000;
