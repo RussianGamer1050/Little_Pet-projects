@@ -9,6 +9,9 @@ import java.util.Date;
 
 public class DatabaseManager {
 
+    // Time formatter
+    private TimeFormatter timeFormatter = new TimeFormatter();
+
     private final String url;
 
     public DatabaseManager(String databaseUrl) {
@@ -80,8 +83,8 @@ public class DatabaseManager {
              PreparedStatement insertStmt = conn.prepareStatement(insertSQL)) {
     
             insertStmt.setString(1, date);
-            insertStmt.setString(2, formatToHourMinute(newTotalWorkTime));
-            insertStmt.setString(3, formatToHourMinute(newTotalBreakTime));
+            insertStmt.setString(2, timeFormatter.formatToHourMinute(newTotalWorkTime));
+            insertStmt.setString(3, timeFormatter.formatToHourMinute(newTotalBreakTime));
             insertStmt.executeUpdate();
     
         } catch (SQLException e) {
@@ -104,16 +107,6 @@ public class DatabaseManager {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-
-    // Format milliseconds to 1h 1minutes format
-    private String formatToHourMinute(long milliseconds) {
-        long totalMinutes = milliseconds / 60000; // Convert to total minutes
-        int hours = (int) totalMinutes / 60;
-        int minutes = (int) totalMinutes % 60;
-        
-        if (hours == 0) return String.format("%dminutes", minutes);
-        return String.format("%dh %dminutes", hours, minutes);
     }
 
     // Method to parse "1h 1minutes" format into milliseconds

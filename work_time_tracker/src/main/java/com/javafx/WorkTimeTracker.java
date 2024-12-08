@@ -13,6 +13,9 @@ import javafx.util.Duration;
 
 public class WorkTimeTracker extends Application {
 
+    //Time formatter 
+    private TimeFormatter timeFormatter = new TimeFormatter();
+
     // Path to db
     private String url = "jdbc:sqlite:work_time_tracker/work_time_tracker.db";
 
@@ -144,16 +147,16 @@ public class WorkTimeTracker extends Application {
     private void update() {
         if (isWorking) {
             workingTime = System.currentTimeMillis() - workingStartTime;
-            workingTimeLabel.setText("Working Time: " + formatTime(workingTime));
+            workingTimeLabel.setText("Working Time: " + timeFormatter.formatTime(workingTime));
 
-            totalWorkingTimeLabel.setText("Total Working Time: " + formatTime(totalWorkingTime + workingTime));
+            totalWorkingTimeLabel.setText("Total Working Time: " + timeFormatter.formatTime(totalWorkingTime + workingTime));
 
         }
         else if (isOnBreak) {
             breakTime = System.currentTimeMillis() - breakStartTime;
-            breakTimeLabel.setText("Break Time: " + formatTime(breakTime));
+            breakTimeLabel.setText("Break Time: " + timeFormatter.formatTime(breakTime));
 
-            totalBreakTimeLabel.setText("Total Break Time: " + formatTime(totalBreakTime + breakTime));
+            totalBreakTimeLabel.setText("Total Break Time: " + timeFormatter.formatTime(totalBreakTime + breakTime));
         }
     }
 
@@ -187,21 +190,10 @@ public class WorkTimeTracker extends Application {
         // maxBreakTime = 0;
 
         // Update labels
-        workingTimeLabel.setText("Working Time: " + formatTime(workingTime));
-        totalWorkingTimeLabel.setText("Total Working Time: " + formatTime(totalWorkingTime));
-        breakTimeLabel.setText("Break Time: " + formatTime(breakTime));
-        totalBreakTimeLabel.setText("Total Break Time: " + formatTime(totalBreakTime));
-    }
-
-    // Function that format milliseconds to h:m:s:m format
-    private String formatTime(long time) {
-        // Separated values for timer
-        int milliseconds = (int) (time % 1000) / 10;
-        int seconds = (int) (time / 1000) % 60;
-        int minutes = (int) (time / 60000) % 60;
-        int hours = (int) time / 360000;
-
-        return String.format("%02d:%02d:%02d,%02d", hours, minutes, seconds, milliseconds);
+        workingTimeLabel.setText("Working Time: " + timeFormatter.formatTime(workingTime));
+        totalWorkingTimeLabel.setText("Total Working Time: " + timeFormatter.formatTime(totalWorkingTime));
+        breakTimeLabel.setText("Break Time: " + timeFormatter.formatTime(breakTime));
+        totalBreakTimeLabel.setText("Total Break Time: " + timeFormatter.formatTime(totalBreakTime));
     }
 
     public static void main(String[] args) {
