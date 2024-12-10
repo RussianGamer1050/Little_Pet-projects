@@ -27,24 +27,19 @@ import javafx.scene.text.Text;
 
 public class CryptoView extends ScrollPane {
     
+    private CryptoViewModel viewModel;
     private final VBox root;
 
     @Inject
     public CryptoView(CryptoViewModel viewModel) {
 
+        this.viewModel = viewModel;
+
         root = new VBox(10);
         root.setPadding(new Insets(20));
 
         // Get cryptoRates from viewModel and display it
-        List<Crypto> cryptoRates = viewModel.getCryptoRates();
-
-        if (cryptoRates != null && !cryptoRates.isEmpty()) {
-            for (Crypto crypto : cryptoRates) {
-                root.getChildren().add(createCryptoCard(crypto));
-            }
-        } else {
-            root.getChildren().add(new Text("No data avaible"));
-        }
+        getCryptoRates();
 
         // Set size limit
         this.setContent(root);
@@ -55,6 +50,28 @@ public class CryptoView extends ScrollPane {
         // Set scroll if too many content
         this.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         this.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+    }
+
+    // Bad name (maybe) [dbg]
+    private void getCryptoRates() {
+
+        List<Crypto> cryptoRates = viewModel.getCryptoRates();
+
+        if (cryptoRates != null && !cryptoRates.isEmpty()) {
+            for (Crypto crypto : cryptoRates) {
+                root.getChildren().add(createCryptoCard(crypto));
+            }
+        } else {
+            root.getChildren().add(new Text("No data avaible"));
+        }
+    }
+
+    public void updateCryptoRates() {
+        // Clear all content before update
+        root.getChildren().clear();
+
+        viewModel.updateCryptoRates();
+        getCryptoRates();
     }
 
     private HBox createCryptoCard(Crypto crypto) {

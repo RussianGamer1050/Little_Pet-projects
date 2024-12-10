@@ -30,4 +30,9 @@ public class CryptoViewModel {
         return cryptoRates;
     }
 
+    public void updateCryptoRates() {
+        cryptoRates = getCryptoUseCase.getCryptoRates();
+        System.out.println("Updated crypto rates: " + cryptoRates);
+    }
+
 }
