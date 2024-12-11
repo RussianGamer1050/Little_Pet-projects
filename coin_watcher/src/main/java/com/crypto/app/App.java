@@ -22,11 +22,13 @@ public class App extends Application{
 
         cryptoUpdater.startUpdating();
 
-        Scene scene = new Scene(cryptoUpdater, 650, 700);
+        Scene scene = new Scene(cryptoUpdater.getCryptoView(), 650, 700);
         stage.setTitle("Coin Watcher");
         stage.setScene(scene);
-        stage.setOnCloseRequest(event -> cryptoUpdater.stopUpdating()); // Stop timer on app close
         stage.show();
+
+        // Stop timer on app close
+        stage.setOnCloseRequest(event -> cryptoUpdater.stopUpdating());
     }
 
     public static void main(String[] args) {

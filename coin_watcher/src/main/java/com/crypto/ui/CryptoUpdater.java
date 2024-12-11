@@ -6,9 +6,8 @@ import java.util.TimerTask;
 import com.google.inject.Inject;
 
 import javafx.application.Platform;
-import javafx.scene.Group;
 
-public class CryptoUpdater extends Group {
+public class CryptoUpdater {
 
     private final Timer timer;
     private CryptoView cryptoView;
@@ -16,10 +15,12 @@ public class CryptoUpdater extends Group {
     @Inject
     public CryptoUpdater(CryptoViewModel viewModel) {
         
+        this.timer = new Timer(true);
         this.cryptoView = new CryptoView(viewModel);
-        this.getChildren().add(cryptoView);
+    }
 
-        this.timer = new Timer(true); // Timer running as daemon
+    public CryptoView getCryptoView() {
+        return cryptoView;
     }
 
     public void startUpdating() {
@@ -29,7 +30,7 @@ public class CryptoUpdater extends Group {
             public void run() {
                 Platform.runLater(() -> cryptoView.updateCryptoRates());
             }
-        }, 0, 10000); // Schedule task with 10-second intervals
+        }, 0, 10000); // Need to check API update rate
     }
 
     public void stopUpdating() {
