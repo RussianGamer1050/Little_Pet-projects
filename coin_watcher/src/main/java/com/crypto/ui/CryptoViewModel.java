@@ -23,11 +23,20 @@ public class CryptoViewModel {
 
     private void loadCryptoRates() {
         cryptoRates = getCryptoUseCase.getCryptoRates();
-        System.out.println("Loaded crypto rates: " + cryptoRates);
+        System.out.println("Loaded crypto rates");
     }
 
     public List<Crypto> getCryptoRates() {
         return cryptoRates;
+    }
+
+    public void setCryptoRates(List<Crypto> cryptoRates) {
+        this.cryptoRates = cryptoRates;
+    }
+
+    public void updateCryptoRates() {
+        cryptoRates = getCryptoUseCase.getCryptoRates();
+        System.out.println("Updated crypto rates");
     }
 
 }

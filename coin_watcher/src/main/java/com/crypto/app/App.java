@@ -1,6 +1,6 @@
 package com.crypto.app;
 
-import com.crypto.ui.CryptoView;
+import com.crypto.ui.CryptoUpdater;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
@@ -18,12 +18,17 @@ public class App extends Application{
     public void start(Stage stage) {
 
         Injector injector = Guice.createInjector(new CryptoModule());
-        CryptoView cryptoView = injector.getInstance(CryptoView.class);
+        CryptoUpdater cryptoUpdater = injector.getInstance(CryptoUpdater.class);
 
-        Scene scene = new Scene(cryptoView, 650, 700);
+        cryptoUpdater.startUpdating();
+
+        Scene scene = new Scene(cryptoUpdater.getCryptoView(), 650, 700);
         stage.setTitle("Coin Watcher");
         stage.setScene(scene);
         stage.show();
+
+        // Stop timer on app close
+        stage.setOnCloseRequest(event -> cryptoUpdater.stopUpdating());
     }
 
     public static void main(String[] args) {
