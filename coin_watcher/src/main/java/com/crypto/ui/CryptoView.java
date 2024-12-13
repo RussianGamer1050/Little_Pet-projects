@@ -54,7 +54,6 @@ public class CryptoView extends ScrollPane {
         this.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
     }
 
-    // Bad name (maybe) [dbg]
     private void getCryptoRates() {
 
         List<Crypto> cryptoRates = viewModel.getCryptoRates();
