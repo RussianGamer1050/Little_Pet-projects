@@ -1,10 +1,8 @@
 package com.crypto.ui;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.crypto.domain.Crypto;
-import com.crypto.domain.Crypto.Trend;
 import com.google.inject.Inject;
 
 import javafx.geometry.Insets;
@@ -30,12 +28,14 @@ import javafx.scene.text.Text;
 public class CryptoView extends ScrollPane {
     
     private CryptoViewModel viewModel;
+    private CryptoTrendChecker trendChecker;
     private final VBox root;
 
     @Inject
     public CryptoView(CryptoViewModel viewModel) {
 
         this.viewModel = viewModel;
+        trendChecker = new CryptoTrendChecker(viewModel);
 
         root = new VBox(10);
         root.setPadding(new Insets(20));
@@ -73,35 +73,15 @@ public class CryptoView extends ScrollPane {
         root.getChildren().clear();
 
         // List of old cryptoRates
-        
-        List<Crypto> oldCryptoRates = new ArrayList<>();
-        oldCryptoRates = viewModel.getCryptoRates();
-        
+        List<Crypto> oldCryptoRates = viewModel.getCryptoRates();
         viewModel.updateCryptoRates();
 
-        checkTrend(oldCryptoRates);
-
-        getCryptoRates();
-    }
-
-    private void checkTrend(List<Crypto> oldCryptoRates) {
-
-        List<Crypto> cryptoRates = viewModel.getCryptoRates();
-
-        if (cryptoRates != null && !cryptoRates.isEmpty()) {
-            for (int i = 0; i < cryptoRates.size(); i++) {
-                if (oldCryptoRates.get(i).getPriceUsd() < cryptoRates.get(i).getPriceUsd()) {
-                    cryptoRates.get(i).setTrend(Trend.UP);
-                }
-                else if (oldCryptoRates.get(i).getPriceUsd() > cryptoRates.get(i).getPriceUsd()) {
-                    cryptoRates.get(i).setTrend(Trend.DOWN);
-                }
-            }
-        } else {
+        if (!trendChecker.setTrends(oldCryptoRates)) {
             root.getChildren().add(new Text("No data avaible"));
+            return;
         }
 
-        viewModel.setCryptoRates(cryptoRates);
+        getCryptoRates();
     }
 
     private HBox createCryptoCard(Crypto crypto) {
@@ -128,6 +108,8 @@ public class CryptoView extends ScrollPane {
         // Add cryptocurrency price
         Text price = new Text(String.format("%.2f USD", crypto.getPriceUsd()));
         price.setFont(Font.font("Arial", 16));
+
+        // Set trend color
         switch (crypto.getTrend()) {
             case UP:
                 price.setFill(Color.DARKGREEN);

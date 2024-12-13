@@ -30,7 +30,7 @@ public class CryptoUpdater {
             public void run() {
                 Platform.runLater(() -> cryptoView.updateCryptoRates());
             }
-        }, 0, 30000); // API update rate around 30 sec.
+        }, 0, 35000); // API update rate around 35 sec.
     }
 
     public void stopUpdating() {
