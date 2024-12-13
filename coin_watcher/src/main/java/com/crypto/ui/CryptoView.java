@@ -1,8 +1,10 @@
 package com.crypto.ui;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.crypto.domain.Crypto;
+import com.crypto.domain.Crypto.Trend;
 import com.google.inject.Inject;
 
 import javafx.geometry.Insets;
@@ -70,8 +72,36 @@ public class CryptoView extends ScrollPane {
         // Clear all content before update
         root.getChildren().clear();
 
+        // List of old cryptoRates
+        
+        List<Crypto> oldCryptoRates = new ArrayList<>();
+        oldCryptoRates = viewModel.getCryptoRates();
+        
         viewModel.updateCryptoRates();
+
+        checkTrend(oldCryptoRates);
+
         getCryptoRates();
+    }
+
+    private void checkTrend(List<Crypto> oldCryptoRates) {
+
+        List<Crypto> cryptoRates = viewModel.getCryptoRates();
+
+        if (cryptoRates != null && !cryptoRates.isEmpty()) {
+            for (int i = 0; i < cryptoRates.size(); i++) {
+                if (oldCryptoRates.get(i).getPriceUsd() < cryptoRates.get(i).getPriceUsd()) {
+                    cryptoRates.get(i).setTrend(Trend.UP);
+                }
+                else if (oldCryptoRates.get(i).getPriceUsd() > cryptoRates.get(i).getPriceUsd()) {
+                    cryptoRates.get(i).setTrend(Trend.DOWN);
+                }
+            }
+        } else {
+            root.getChildren().add(new Text("No data avaible"));
+        }
+
+        viewModel.setCryptoRates(cryptoRates);
     }
 
     private HBox createCryptoCard(Crypto crypto) {
@@ -98,7 +128,16 @@ public class CryptoView extends ScrollPane {
         // Add cryptocurrency price
         Text price = new Text(String.format("%.2f USD", crypto.getPriceUsd()));
         price.setFont(Font.font("Arial", 16));
-        price.setFill(Color.DARKGREEN);
+        switch (crypto.getTrend()) {
+            case UP:
+                price.setFill(Color.DARKGREEN);
+                break;
+            case DOWN:
+                price.setFill(Color.DARKRED);
+                break;
+            default:
+                price.setFill(Color.GRAY);
+        }
 
         card.getChildren().addAll(name, price);
 
